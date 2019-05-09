@@ -1,8 +1,8 @@
 /* jslint node: true */
 module.exports = (sequelize, { INTEGER }) => {
     const Reward = sequelize.define('Reward', {
-      amount: INTEGER(4),  // ?4 bytes = max integer up to 4294967295? 
-      spent: INTEGER(4),
+      amount: INTEGER(),
+      spent: INTEGER(),
     })
   
     Reward.associate = ({ User }) => {
@@ -11,4 +11,3 @@ module.exports = (sequelize, { INTEGER }) => {
   
     return Reward
   }
-  
