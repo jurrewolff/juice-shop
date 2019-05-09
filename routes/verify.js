@@ -35,10 +35,18 @@ exports.captchaBypassChallenge = () => (req, res, next) => {
 }
 
 exports.registerAdminChallenge = () => (req, res, next) => {
-  /* jshint eqeqeq:false */
   if (utils.notSolved(challenges.registerAdminChallenge)) {
     if (req.body && req.body.isAdmin && req.body.isAdmin) {
       utils.solve(challenges.registerAdminChallenge)
+    }
+  }
+  next()
+}
+
+exports.passwordRepeatChallenge = () => (req, res, next) => {
+  if (utils.notSolved(challenges.passwordRepeatChallenge)) {
+    if (req.body && req.body.passwordRepeat !== req.body.password) {
+      utils.solve(challenges.passwordRepeatChallenge)
     }
   }
   next()
@@ -51,6 +59,8 @@ exports.accessControlChallenges = () => ({ url }, res, next) => {
     utils.solve(challenges.adminSectionChallenge)
   } else if (utils.notSolved(challenges.tokenSaleChallenge) && utils.endsWith(url, '/56px.png')) {
     utils.solve(challenges.tokenSaleChallenge)
+  } else if (utils.notSolved(challenges.privacyPolicyChallenge) && utils.endsWith(url, '/81px.png')) {
+    utils.solve(challenges.privacyPolicyChallenge)
   } else if (utils.notSolved(challenges.extraLanguageChallenge) && utils.endsWith(url, '/tlh_AA.json')) {
     utils.solve(challenges.extraLanguageChallenge)
   } else if (utils.notSolved(challenges.retrieveBlueprintChallenge) && utils.endsWith(url, cache.retrieveBlueprintChallengeFile)) {
