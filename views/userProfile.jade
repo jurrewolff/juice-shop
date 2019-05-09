@@ -40,7 +40,7 @@ html(lang='en')
                         p(style='margin-bottom:10%;')
 
 
-                .col-sm-7
+                .col-sm-7   
                     form(action='/profile', method='post')
                         .form-group
                             label(for='username') Username:
@@ -49,4 +49,6 @@ html(lang='en')
                             label(for='email') Email:
                             input#email.form-control(type='email', name='email', value='#{email}', readonly=true)
                         button(id='submit', type='submit').btn.btn-default Set Username
+                        h4(style='margin-top:23%;') Loyalty rewards
+                        p Your reward points: 0
         
