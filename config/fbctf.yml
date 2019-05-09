@@ -242,6 +242,9 @@ ctf:
     dlpPastebinDataLeakChallenge:
       name: Turkmenistan
       code: TK
+    videoXssChallenge:
+      name: Pakistan
+      code: PK
     recyclesMissingItemChallenge:
       name: Uganda
       code: UG
@@ -257,3 +260,6 @@ ctf:
     privacyPolicyProofChallenge:
       name: Namibia
       code: NA
+    passwordRepeatChallenge:
+      name: Guyana
+      code: GY
