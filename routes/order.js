@@ -12,7 +12,7 @@ const db = require('../data/mongodb')
 module.exports = function placeOrder () {
   return (req, res, next) => {
     const id = req.params.id
-    models.Basket.find({ where: { id }, include: [ { model: models.Product, paranoid: false } ] })
+    models.Basket.findOne({ where: { id }, include: [ { model: models.Product, paranoid: false } ] })
       .then(basket => {
         if (basket) {
           const customer = insecurity.authenticatedUsers.from(req)
@@ -38,13 +38,16 @@ module.exports = function placeOrder () {
           let totalPrice = 0
           let basketProducts = []
           let totalPoints = 0
+          let itemBonus = 0;
+          let usedPoints =12;
+          
           basket.Products.forEach(({ BasketItem, price, name }) => {
             if (utils.notSolved(challenges.christmasSpecialChallenge) && BasketItem.ProductId === products.christmasSpecial.id) {
               utils.solve(challenges.christmasSpecialChallenge)
             }
 
             const itemTotal = price * BasketItem.quantity
-            const itemBonus = Math.round(price / 10) * BasketItem.quantity
+            // const itemBonus = Math.round(price / 10) * BasketItem.quantity
             const product = { quantity: BasketItem.quantity,
               name: name,
               price: price,
@@ -55,8 +58,32 @@ module.exports = function placeOrder () {
             doc.text(BasketItem.quantity + 'x ' + name + ' ea. ' + price + ' = ' + itemTotal)
             doc.moveDown()
             totalPrice += itemTotal
-            totalPoints += itemBonus
+            // totalPoints += itemBonus
           })
+
+          //Gebruikte Bonuspunten
+            //Elk bonuspunt is 0.5 currency, maximaal 25% van de bestelling 
+            //De bonuspunten die je krijgt na de bestelling zijn 10% van het gehele bedrag
+            // itemBonus wordt berekend door een fucntion
+            if (usedPoints>0) {
+              const pointsCurrency = (usedPoints*0.5).toFixed(2);
+              const pointsPercentage = ((pointsCurrency/totalPrice)*100).toFixed(1);
+
+              doc.text("The " + usedPoints + " bonus points are equal to a " + pointsPercentage + "% discount");
+              doc.moveDown;
+
+              
+
+              doc.moveDown();
+              doc.text("" + totalPrice + " - " + pointsPercentage + "% = " + (totalPrice - pointsCurrency));
+              doc.moveDown;
+
+              totalPrice = (totalPrice - pointsCurrency);
+
+              itemBonus = Math.round(totalPrice *0.1);
+
+            }
+
           doc.moveDown()
           const discount = calculateApplicableDiscount(basket, req)
           if (discount > 0) {
@@ -67,7 +94,7 @@ module.exports = function placeOrder () {
           }
           doc.font('Helvetica-Bold', 20).text('Total Price: ' + totalPrice.toFixed(2))
           doc.moveDown()
-          doc.font('Helvetica-Bold', 15).text('Bonus Points Earned: ' + totalPoints)
+          doc.font('Helvetica-Bold', 15).text('Bonus Points Earned: ' + itemBonus)
           doc.font('Times-Roman', 15).text('(You will be able to these points for amazing bonuses in the future!)')
           doc.moveDown()
           doc.moveDown()
