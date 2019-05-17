@@ -9,10 +9,14 @@ const challenges = require('../data/datacache').challenges
 const config = require('config')
 const db = require('../data/mongodb')
 
-module.exports = function placeOrder () {
+module.exports = function placeOrder() {
   return (req, res, next) => {
     const id = req.params.id
+<<<<<<< HEAD
     models.Basket.findOne({ where: { id }, include: [ { model: models.Product, paranoid: false } ] })
+=======
+    models.Basket.findOne({ where: { id }, include: [{ model: models.Product, paranoid: false }] })
+>>>>>>> develop
       .then(basket => {
         if (basket) {
           const customer = insecurity.authenticatedUsers.from(req)
@@ -47,8 +51,14 @@ module.exports = function placeOrder () {
             }
 
             const itemTotal = price * BasketItem.quantity
+<<<<<<< HEAD
             // const itemBonus = Math.round(price / 10) * BasketItem.quantity
             const product = { quantity: BasketItem.quantity,
+=======
+            const itemBonus = Math.round(price / 10) * BasketItem.quantity
+            const product = {
+              quantity: BasketItem.quantity,
+>>>>>>> develop
               name: name,
               price: price,
               total: itemTotal,
@@ -117,6 +127,7 @@ module.exports = function placeOrder () {
           fileWriter.on('finish', () => {
             basket.update({ coupon: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
+            models.Reward.create({amount: totalPoints, UserId: id })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {
@@ -128,7 +139,7 @@ module.exports = function placeOrder () {
   }
 }
 
-function calculateApplicableDiscount (basket, req) {
+function calculateApplicableDiscount(basket, req) {
   if (insecurity.discountFromCoupon(basket.coupon)) {
     let discount = insecurity.discountFromCoupon(basket.coupon)
     if (utils.notSolved(challenges.forgedCouponChallenge) && discount >= 80) {

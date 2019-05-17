@@ -1,0 +1,28 @@
+if (usedPoints>0) {
+              const pointsCurrency = (usedPoints*0.5)
+              const pointsDiscount =  (totalPrice * pointsPercentage).toFixed(2);
+
+              doc.text("The " + usedPoints + " bonus points are equal to a " + (pointsPercentage * 100) + "% discount");
+              doc.moveDown;
+
+              totalPrice -= pointsDiscount
+
+              doc.text("total price is now " + totalPrice + "");
+              doc.moveDown;
+
+
+
+
+
+              //totaal aan puntnkorting in currency 
+              const pointsCurrency = (usedPoints*0.5)
+              //max percentage korting
+              const maxDiscount = (totalprice*0.25).toFixed(2);
+
+            // wanneer de points minder dan of gelijk zijn aan maxdiscount kunnen de points gebruikt worden
+              if(maxdiscount <= pointsCurrency){
+
+              }
+
+
+            

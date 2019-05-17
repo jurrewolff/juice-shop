@@ -17,6 +17,7 @@
   "MANDATORY_PASSWORD_REPEAT": "Por favor, repita sua senha.",
   "INVALID_PASSWORD_LENGTH": "A senha deve possuir {{length}} caracteres.",
   "LABEL_PASSWORD_REPEAT": "Deve repetir a senha",
+  "PASSWORDS_NOT_MATCHING": "Passwords do not match",
   "BTN_REGISTER": "Registe-se",
   "TITLE_LOGOUT": "Sair",
   "CONFIRM_LOGGED_OUT": "Logout feito com sucesso",
@@ -57,6 +58,7 @@
   "TITLE_BASKET": "Cesto de compras",
   "LABEL_QUANTITY": "Quantidade",
   "LABEL_TOTAL_PRICE": "Preço Total",
+  "CHECKOUT_FOR_BONUS_POINTS": "Se efetuares esta compra irás ganhar {{bonus}} pontos bónus!",
   "BTN_CHECKOUT": "Finalizar Compra",
   "BTN_CREDIT_CARD": "Cartão de Crédito",
   "INVALID_COUPON_LENGTH": "O cupão deve possuir {{length}} caracteres.",
@@ -165,7 +167,13 @@
   "UNAUTHORIZED_PAGE_ACCESS_ERROR": "Não estás autorizado a aceder a esta página!",
   "TITLE_PRIVACY_POLICY": "Política de Privacidade",
   "TITLE_TWO_FACTOR_AUTHENTICATION": "Autenticação de 2 factores",
-  "TITLE_REQUEST_DATA_EXPORT": "Pedido de Exportação de Dados",
+  "TITLE_REQUEST_DATA_EXPORT": "Pedido de Obtenção de Dados",
   "PRIVACY_AND_SECURITY": "Privacidade e Segurança",
-  "MENU": "Menu"
+  "MENU": "Menu",
+  "BTN_SHOW_ALL": "Ver tudo",
+  "BTN_HIDE_ALL": "Esconder tudo",
+  "TYPE_THESE_LETTERS": "Type these {{length}} letters",
+  "BTN_REQUEST": "Request",
+  "EXPORT_LABEL": "Export Format",
+  "ACCOUNT": "Account"
 }
