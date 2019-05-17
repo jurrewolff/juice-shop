@@ -88,10 +88,10 @@ module.exports = function placeOrder() {
             eta: Math.floor((Math.random() * 5) + 1).toString()
           })
 
-          fileWriter.on('finish', () => { // Hier worden models geupdated
+          fileWriter.on('finish', () => {
             basket.update({ coupon: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
-            models.Reward.create({amount: totalPoints, UserId: id }) // Nu een directe kopie van destroy. Update is miss verkeerd (Zie sequelize doc)
+            models.Reward.create({amount: totalPoints, UserId: id })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {
