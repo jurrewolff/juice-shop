@@ -258,6 +258,7 @@ const autoModels = [
   { name: 'Product', exclude: [] },
   { name: 'Feedback', exclude: [] },
   { name: 'BasketItem', exclude: [] },
+  { name: 'Reward', exclude: [] },
   { name: 'Challenge', exclude: [] },
   { name: 'Complaint', exclude: [] },
   { name: 'Recycle', exclude: [] },
