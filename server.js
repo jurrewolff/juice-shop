@@ -41,7 +41,6 @@ const changePassword = require('./routes/changePassword')
 const resetPassword = require('./routes/resetPassword')
 const securityQuestion = require('./routes/securityQuestion')
 const search = require('./routes/search')
-const bonus = require('./routes/bonusPoints')
 const coupon = require('./routes/coupon')
 const basket = require('./routes/basket')
 const order = require('./routes/order')
@@ -259,6 +258,7 @@ const autoModels = [
   { name: 'Product', exclude: [] },
   { name: 'Feedback', exclude: [] },
   { name: 'BasketItem', exclude: [] },
+  { name: 'Reward', exclude: [] },
   { name: 'Challenge', exclude: [] },
   { name: 'Complaint', exclude: [] },
   { name: 'Recycle', exclude: [] },
@@ -292,7 +292,6 @@ app.get('/rest/user/whoami', currentUser())
 app.get('/rest/user/authentication-details', authenticatedUsers())
 app.get('/rest/product/search', search())
 app.get('/rest/basket/:id', basket())
-app.get('/rest/basket/:id/bonus', bonus())
 app.post('/rest/basket/:id/checkout', order())
 app.put('/rest/basket/:id/coupon/:coupon', coupon())
 app.get('/rest/admin/application-version', appVersion())

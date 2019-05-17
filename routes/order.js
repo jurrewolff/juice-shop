@@ -91,7 +91,7 @@ module.exports = function placeOrder() {
           fileWriter.on('finish', () => { // Hier worden models geupdated
             basket.update({ coupon: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
-            models.Bonus.create({amount: totalPoints, UserId: id }) // Nu een directe kopie van destroy. Update is miss verkeerd (Zie sequelize doc)
+            models.Reward.create({amount: totalPoints, UserId: id }) // Nu een directe kopie van destroy. Update is miss verkeerd (Zie sequelize doc)
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {
