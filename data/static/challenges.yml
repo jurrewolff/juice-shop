@@ -687,3 +687,10 @@
   hint: 'You can solve this by cleverly interacting with the UI or bypassing it altogether.'
   # hintUrl: 'https://bkimminich.gitbooks.io/pwning-owasp-juice-shop/content/part2/improper-input-validation.html#follow-the-dry-principle-while-registering-a-user'
   key: passwordRepeatChallenge
+-
+    name: 'Steal Bonus Points'
+    category: 'Broken Access Control'
+    description: 'Steal bonus points from another user.'
+    difficulty: 2
+    hint: 'Start this challenge by visiting your own basket.'
+    key: stealBonusPointChallenge
