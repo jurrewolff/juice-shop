@@ -5,6 +5,8 @@ const insecurity = require('../lib/insecurity')
 const jade = require('jade')
 const config = require('config')
 const themes = require('../views/themes/themes').themes
+const request = require('request');
+
 
 module.exports = function getUserProfile () {
   return (req, res, next) => {
@@ -27,6 +29,15 @@ module.exports = function getUserProfile () {
             username = '\\' + username
           }
           const theme = themes[config.get('application.theme')]
+
+          request('http://localhost:3000/api/Users', function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            jadeTemplate = jadeTemplate.replace(/_test_/g, body)
+          }
+          else {
+            jadeTemplate = jadeTemplate.replace(/_test_/g, '0')
+          }
+          
           jadeTemplate = jadeTemplate.replace(/_username_/g, username)
           jadeTemplate = jadeTemplate.replace(/_emailHash_/g, insecurity.hash(user.dataValues.email))
           jadeTemplate = jadeTemplate.replace(/_title_/g, config.get('application.name'))
@@ -36,6 +47,7 @@ module.exports = function getUserProfile () {
           jadeTemplate = jadeTemplate.replace(/_navColor_/g, theme.navColor)
           const fn = jade.compile(jadeTemplate)
           res.send(fn(user.dataValues))
+        })
         }).catch(error => {
           next(error)
         })
