@@ -12,11 +12,7 @@ const db = require('../data/mongodb')
 module.exports = function placeOrder() {
   return (req, res, next) => {
     const id = req.params.id
-<<<<<<< HEAD
-    models.Basket.findOne({ where: { id }, include: [ { model: models.Product, paranoid: false } ] })
-=======
     models.Basket.findOne({ where: { id }, include: [{ model: models.Product, paranoid: false }] })
->>>>>>> develop
       .then(basket => {
         if (basket) {
           const customer = insecurity.authenticatedUsers.from(req)
@@ -51,14 +47,10 @@ module.exports = function placeOrder() {
             }
 
             const itemTotal = price * BasketItem.quantity
-<<<<<<< HEAD
             // const itemBonus = Math.round(price / 10) * BasketItem.quantity
-            const product = { quantity: BasketItem.quantity,
-=======
             const itemBonus = Math.round(price / 10) * BasketItem.quantity
             const product = {
               quantity: BasketItem.quantity,
->>>>>>> develop
               name: name,
               price: price,
               total: itemTotal,
@@ -68,13 +60,7 @@ module.exports = function placeOrder() {
             doc.text(BasketItem.quantity + 'x ' + name + ' ea. ' + price + ' = ' + itemTotal)
             doc.moveDown()
             totalPrice += itemTotal
-            // totalPoints += itemBonus
           })
-
-          //Gebruikte Bonuspunten
-            //Elk bonuspunt is 0.5 currency, maximaal 25% van de bestelling 
-            //De bonuspunten die je krijgt na de bestelling zijn 10% van het gehele bedrag
-            // itemBonus wordt berekend door een fucntion
             if (usedPoints>0) {
               const pointsCurrency = (usedPoints*0.5).toFixed(2);
               const pointsPercentage = ((pointsCurrency/totalPrice)*100).toFixed(1);
