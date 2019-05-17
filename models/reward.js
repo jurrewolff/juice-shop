@@ -2,7 +2,6 @@
 module.exports = (sequelize, { INTEGER }) => {
     const Reward = sequelize.define('Reward', {
       amount: INTEGER(),
-      spent: INTEGER(),
     })
   
     Reward.associate = ({ User }) => {

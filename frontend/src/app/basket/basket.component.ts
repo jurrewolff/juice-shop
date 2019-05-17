@@ -104,10 +104,26 @@ export class BasketComponent implements OnInit {
     this.addToQuantity(id,-1)
   }
 
+  incReward () {
+    this.userService.whoAmI().subscribe((data) => {
+      this.addToReward(data.id, 1)
+    })
+  }
+
   addToQuantity (id,value) {
     this.basketService.get(id).subscribe((basketItem) => {
       let newQuantity = basketItem.quantity + value
-      this.basketService.put(id, { quantity: newQuantity < 1 ? 1 : newQuantity }).subscribe(() => {
+      this.basketService.putBonus(id, { quantity: newQuantity < 1 ? 1 : newQuantity }).subscribe(() => {
+        this.load()
+      },(err) => console.log(err))
+    }, (err) => console.log(err))
+  }
+
+  addToReward (id,value) {
+    this.basketService.getBonus(id).subscribe((data) => {
+      let newBonus = data.amount + value
+      this.basketService.putBonus(id, { amount: newBonus }).subscribe((data) => {
+        console.log(data.amount)
         this.load()
       },(err) => console.log(err))
     }, (err) => console.log(err))
