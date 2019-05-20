@@ -50,8 +50,6 @@
         <div style="margin-top:5px;" translate [translateParams]="{'bonus': bonus}">CHECKOUT_FOR_BONUS_POINTS</div> 
     </mat-card>
 
-    <h1>{{bonusBalance}}</h1>
-
     <mat-expansion-panel [expanded]="couponPanelExpanded">
 
       <div *ngIf="confirmation && !couponControl.dirty" style="margin-top:5px;">{{ confirmation }}</div>

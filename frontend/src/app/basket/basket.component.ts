@@ -218,15 +218,6 @@ export class BasketComponent implements OnInit {
     })
   }
 
-  getBonusBalance () {    // DEZE IS NIET MEER NODIG :)
-    this.userService.whoAmI().subscribe((whoAmIdata) => {
-      this.basketService.getBonus(whoAmIdata.id).subscribe((bonusData) => {
-        this.bonusBalance = bonusData.amount
-        // Return of log de balance ofzo
-      },(err) => console.log(err))
-      })
-  }
-
   resetForm () {
     this.couponControl.setValue('')
     this.couponControl.markAsPristine()
