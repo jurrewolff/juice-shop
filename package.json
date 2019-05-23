@@ -161,7 +161,8 @@
     "protractor": "npm run e2e",
     "e2e": "node test/e2eTests.js",
     "vagrant": "cd vagrant && vagrant up",
-    "package": "grunt package"
+    "package": "grunt package",
+    "debug": "node --inspect app"
   },
   "engines": {
     "node": "8 - 11"

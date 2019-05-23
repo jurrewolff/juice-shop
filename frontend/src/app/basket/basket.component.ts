@@ -113,7 +113,7 @@ export class BasketComponent implements OnInit {
   addToQuantity (id,value) {
     this.basketService.get(id).subscribe((basketItem) => {
       let newQuantity = basketItem.quantity + value
-      this.basketService.putBonus(id, { quantity: newQuantity < 1 ? 1 : newQuantity }).subscribe(() => {
+      this.basketService.put(id, { quantity: newQuantity < 1 ? 1 : newQuantity }).subscribe(() => {
         this.load()
       },(err) => console.log(err))
     }, (err) => console.log(err))
