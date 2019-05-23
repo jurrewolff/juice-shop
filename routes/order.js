@@ -90,7 +90,6 @@ module.exports = function placeOrder() {
           fileWriter.on('finish', () => {
             basket.update({ coupon: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
-            models.Reward.create({amount: totalPoints, UserId: id })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {
