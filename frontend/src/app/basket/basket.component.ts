@@ -12,6 +12,7 @@ import {
   faCartArrowDown,
   faCreditCard,
   faGift,
+  faCoins,
   faHeart,
   faMinusSquare,
   faPlusSquare,
@@ -32,6 +33,7 @@ dom.watch()
   templateUrl: './basket.component.html',
   styleUrls: ['./basket.component.scss']
 })
+
 export class BasketComponent implements OnInit {
 
   public userEmail: string
@@ -40,6 +42,7 @@ export class BasketComponent implements OnInit {
   public bonus = 0
   public couponPanelExpanded: boolean = false
   public paymentPanelExpanded: boolean = false
+  public pointAmountExpanded: boolean = false
   public couponControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(10), Validators.maxLength(10)])
   public error = undefined
   public confirmation = undefined
@@ -49,6 +52,7 @@ export class BasketComponent implements OnInit {
   public redirectUrl = null
   public clientDate: any
   private campaignCoupon: string
+  public points: FormControl = new FormControl('',[Validators.required, Validators.min(0)])
 
   constructor (private dialog: MatDialog,private basketService: BasketService,private userService: UserService,private windowRefService: WindowRefService,private configurationService: ConfigurationService,private translate: TranslateService) {}
 
@@ -61,6 +65,7 @@ export class BasketComponent implements OnInit {
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false
     this.paymentPanelExpanded = localStorage.getItem('paymentPanelExpanded') ? JSON.parse(localStorage.getItem('paymentPanelExpanded')) : false
+    this.pointAmountExpanded = localStorage.getItem('pointAmountExpanded') ? JSON.parse(localStorage.getItem('pointAmountExpanded')) : false
 
     this.configurationService.getApplicationConfiguration().subscribe((config) => {
       if (config && config.application) {
@@ -139,6 +144,11 @@ export class BasketComponent implements OnInit {
     localStorage.setItem('paymentPanelExpanded',JSON.stringify(this.paymentPanelExpanded))
   }
 
+  togglePoint () {
+    this.pointAmountExpanded = !this.pointAmountExpanded
+    localStorage.setItem('pointAmountExpanded',JSON.stringify(this.pointAmountExpanded))
+  }
+
   checkout () {
     this.basketService.checkout(sessionStorage.getItem('bid'), btoa(this.campaignCoupon + '-' + this.clientDate)).subscribe((orderConfirmationPath) => {
       this.redirectUrl = this.basketService.hostServer + orderConfirmationPath
@@ -168,6 +178,10 @@ export class BasketComponent implements OnInit {
         this.resetForm()
       })
     }
+  }
+
+  applyPoints () {
+      console.log(this.points.value)
   }
 
   showConfirmation (discount) {
