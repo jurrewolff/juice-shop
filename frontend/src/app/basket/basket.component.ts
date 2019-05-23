@@ -40,7 +40,9 @@ export class BasketComponent implements OnInit {
   public bonus = 0
   public couponPanelExpanded: boolean = false
   public paymentPanelExpanded: boolean = false
+  public pointsPanelExpanded: boolean = false
   public couponControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(10), Validators.maxLength(10)])
+  public pointsControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(1), Validators.maxLength(10)])
   public error = undefined
   public confirmation = undefined
   public twitterUrl = null
@@ -61,6 +63,8 @@ export class BasketComponent implements OnInit {
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false
     this.paymentPanelExpanded = localStorage.getItem('paymentPanelExpanded') ? JSON.parse(localStorage.getItem('paymentPanelExpanded')) : false
+    this.pointsPanelExpanded = localStorage.getItem('pointsPanelExpanded') ? JSON.parse(localStorage.getItem('pointsPanelExpanded')) : false
+
 
     this.configurationService.getApplicationConfiguration().subscribe((config) => {
       if (config && config.application) {
@@ -76,20 +80,40 @@ export class BasketComponent implements OnInit {
       }
     },(err) => console.log(err))
   }
-
+public 
+  
   load () {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
       let bonusPoints = 0
+      let pointsCurrency = 0;
+      let pointsPercentage = 0;
+      let totalPrice = 0;
+      let maxDiscount = 0;
+      let usedPoints = 60;
+
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
-          bonusPoints += Math.round(product.price / 10) * product.BasketItem.quantity
+          totalPrice = (product.price) * product.BasketItem.quantity;
+          maxDiscount = Math.round((totalPrice/100) * 0.25);
+
+          pointsCurrency = Math.round(usedPoints*0.5);
+          pointsPercentage = (pointsCurrency/totalPrice)*100;
+        }
+
+        if (pointsCurrency > maxDiscount){
+        console.log("error");
+        }
+
+        if(usedPoints>0){
+              totalPrice = (totalPrice - pointsCurrency);
+              bonusPoints = Math.round(totalPrice *0.1);
         }
       })
       this.bonus = bonusPoints
     },(err) => console.log(err))
   }
-
+ 
   delete (id) {
     this.basketService.del(id).subscribe(() => {
       this.load()
@@ -134,6 +158,11 @@ export class BasketComponent implements OnInit {
     localStorage.setItem('couponPanelExpanded',JSON.stringify(this.couponPanelExpanded))
   }
 
+  togglePoints () {
+    this.pointsPanelExpanded = !this.pointsPanelExpanded
+    localStorage.setItem('pointsPanelExpanded',JSON.stringify(this.pointsPanelExpanded))
+  }
+
   togglePayment () {
     this.paymentPanelExpanded = !this.paymentPanelExpanded
     localStorage.setItem('paymentPanelExpanded',JSON.stringify(this.paymentPanelExpanded))
@@ -169,6 +198,8 @@ export class BasketComponent implements OnInit {
       })
     }
   }
+
+  
 
   showConfirmation (discount) {
     this.resetForm()
