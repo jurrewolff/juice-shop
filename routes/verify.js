@@ -34,6 +34,18 @@ exports.captchaBypassChallenge = () => (req, res, next) => {
   next()
 }
 
+exports.stealRewardPointChallenge = () => (req, res, next) => {
+
+  if (utils.notSolved(challenges.stealRewardPointChallenge)) {
+      const user = insecurity.authenticatedUsers.from(req)
+      const userId = user && user.data ? user.data.id : undefined
+    if (req.body && req.body.UserId && req.body.UserId != userId) {
+        utils.solve(challenges.stealRewardPointChallenge)
+      }
+  }
+  next()
+}
+
 exports.registerAdminChallenge = () => (req, res, next) => {
   if (utils.notSolved(challenges.registerAdminChallenge)) {
     if (req.body && req.body.isAdmin && req.body.isAdmin) {
