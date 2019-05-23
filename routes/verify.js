@@ -39,7 +39,8 @@ exports.stealRewardPointChallenge = () => (req, res, next) => {
   if (utils.notSolved(challenges.stealRewardPointChallenge)) {
       const user = insecurity.authenticatedUsers.from(req)
       const userId = user && user.data ? user.data.id : undefined
-    if (req.body && req.body.UserId && req.body.UserId != userId) {
+      const id = req.params.id
+    if (user && id && id !== 'undefined' && id !== 'null' && userId != id) {
         utils.solve(challenges.stealRewardPointChallenge)
       }
   }

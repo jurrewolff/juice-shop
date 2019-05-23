@@ -61,7 +61,7 @@ export class BasketComponent implements OnInit {
 
       this.basketService.getBonus(data.id).subscribe((bonusData) => {
         this.bonusBalance = bonusData.amount
-      },(err) => console.log(err)) 
+      },(err) => console.log(err))
     },(err) => console.log(err))
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false
