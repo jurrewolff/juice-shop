@@ -2,6 +2,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { UserService } from '../Services/user.service'
 import { CookieService } from 'ngx-cookie'
 import { Component, OnInit } from '@angular/core'
+import { BasketService } from '../Services/basket.service'
 
 @Component({
   selector: 'app-oauth',
@@ -10,13 +11,21 @@ import { Component, OnInit } from '@angular/core'
 })
 export class OAuthComponent implements OnInit {
 
-  constructor (private cookieService: CookieService, private userService: UserService, private router: Router, private route: ActivatedRoute) { }
+  constructor (private cookieService: CookieService, private basketService: BasketService, private userService: UserService, private router: Router, private route: ActivatedRoute) { }
+  
+  
+  reward = { 
+    amount: 0 // Default value, new accounts have 0 bonus points
+  }
+
 
   ngOnInit () {
     this.userService.oauthLogin(this.parseRedirectUrlParams()['access_token']).subscribe((profile: any) => {
       let password = btoa(profile.email.split('').reverse().join(''))
-      this.userService.save({ email: profile.email, password: password, passwordRepeat: password }).subscribe(() => {
-        this.login(profile)
+      this.userService.save({ email: profile.email, password: password, passwordRepeat: password }).subscribe((response) => {
+        this.basketService.postBonus({amount: this.reward.amount, UserId: response.id}).subscribe(() => {
+          this.login(profile)
+        })       
       }, () => this.login(profile))
     }, (error) => {
       this.invalidateSession(error)

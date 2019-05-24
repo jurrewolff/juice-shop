@@ -1,0 +1,22 @@
+.loyalty {
+    margin-top: 23%;
+} 
+
+.infotext {
+    color:#fff;
+    border:solid 3px lightgray;
+    text-align:left;
+    padding:10px;
+    border-radius:10px;
+    box-shadow: 2px 2px 2px #333;
+    position:absolute;
+    left:-28%;
+    right: 100%;
+    bottom: 10%;
+    visibility:hidden;
+    font-size:small;
+}
+
+.far.fa-question-circle:hover + .infotext {
+    visibility: visible;
+}

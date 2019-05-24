@@ -5,9 +5,9 @@ import { Component, OnInit } from '@angular/core'
 import { SecurityQuestionService } from '../Services/security-question.service'
 import { Router } from '@angular/router'
 import { library, dom } from '@fortawesome/fontawesome-svg-core'
-
 import { faUserPlus, faExclamationCircle } from '@fortawesome/free-solid-svg-icons'
 import { FormSubmitService } from '../Services/form-submit.service'
+import { BasketService } from '../Services/basket.service'
 
 library.add(faUserPlus, faExclamationCircle)
 dom.watch()
@@ -31,6 +31,7 @@ export class RegisterComponent implements OnInit {
     private userService: UserService,
     private securityAnswerService: SecurityAnswerService,
     private router: Router,
+    private basketService: BasketService,
     private formSubmitService: FormSubmitService) { }
 
   ngOnInit () {
@@ -50,10 +51,17 @@ export class RegisterComponent implements OnInit {
       securityAnswer: this.securityAnswerControl.value
     }
 
+    const reward = { 
+      amount: 0 // Default value, new accounts have 0 bonus points
+    }
+
     this.userService.save(user).subscribe((response: any) => {
       this.securityAnswerService.save({UserId: response.id, answer: this.securityAnswerControl.value,
         SecurityQuestionId: this.securityQuestionControl.value}).subscribe(() => {
-          this.router.navigate(['/login'])
+          // Reward stuff here
+          this.basketService.postBonus({amount: reward.amount, UserId: response.id}).subscribe(() => {
+            this.router.navigate(['/login'])
+          })          
         })
     }, (err) => {
       console.log(err)
