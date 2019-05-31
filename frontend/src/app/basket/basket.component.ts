@@ -44,6 +44,7 @@ export class BasketComponent implements OnInit {
   public paymentPanelExpanded: boolean = false
   public pointAmountExpanded: boolean = false
   public couponControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(10), Validators.maxLength(10)])
+  public points: FormControl = new FormControl('',[Validators.required, Validators.maxLength(3), Validators.minLength(1), Validators.pattern('[0-9]*')])
   public error = undefined
   public confirmation = undefined
   public twitterUrl = null
@@ -52,7 +53,7 @@ export class BasketComponent implements OnInit {
   public redirectUrl = null
   public clientDate: any
   private campaignCoupon: string
-  public points: FormControl = new FormControl('',[Validators.required, Validators.min(0)])
+  public appliedPoints: number
 
   constructor (private dialog: MatDialog,private basketService: BasketService,private userService: UserService,private windowRefService: WindowRefService,private configurationService: ConfigurationService,private translate: TranslateService) {}
 
@@ -82,13 +83,49 @@ export class BasketComponent implements OnInit {
     },(err) => console.log(err))
   }
 
+  applyPoints () {
+    if (this.points.value <= 999 && this.points.value >= 0){ //Value between 0 and 999
+      if (this.points.value == 0){ //When default value is selected (0), points will not be filled, so filling appliedPoints with 0 instead
+        this.appliedPoints = 0;
+      }
+      else{ //If number is between 0-999 and not 0, use value
+      this.appliedPoints = this.points.value 
+      }
+    }  
+    else{console.log("Amount needs to be between 0 and 999.") //Temp error in console is value is not 0-999
+    this.points.setValue(0) //Resetting both values to 0
+    this.appliedPoints = 0
+  }
+  console.log(this.points.value) //Check
+  console.log(this.appliedPoints) //Check
+  }
+
   load () {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
       let bonusPoints = 0
+      let pointsCurrency = 0;
+      let pointsPercentage = 0;
+      let totalPrice = 0;
+      let maxDiscount = 0;
+      let usedPoints = this.appliedPoints;
+
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
-          bonusPoints += Math.round(product.price / 10) * product.BasketItem.quantity
+          totalPrice = (product.price) * product.BasketItem.quantity;
+          maxDiscount = Math.round((totalPrice/100) * 0.25);
+
+          pointsCurrency = Math.round(usedPoints*0.5);
+          pointsPercentage = (pointsCurrency/totalPrice)*100;
+        }
+
+        if (pointsCurrency > maxDiscount){
+        console.log("error");
+        }
+
+        if(usedPoints>0){
+              totalPrice = (totalPrice - pointsCurrency);
+              bonusPoints = Math.round(totalPrice *0.1);
         }
       })
       this.bonus = bonusPoints
@@ -178,10 +215,6 @@ export class BasketComponent implements OnInit {
         this.resetForm()
       })
     }
-  }
-
-  applyPoints () {
-      console.log(this.points.value)
   }
 
   showConfirmation (discount) {

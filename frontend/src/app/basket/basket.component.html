@@ -132,10 +132,10 @@
 
     <mat-expansion-panel [expanded]="pointAmountExpanded">
         <mat-form-field>
-            <input id="points" [formControl]="points" style="margin-top:10px;" matInput type="number" value="0">
+            <input pattern="[1-9]*" id="points" [formControl]="points" style="margin-top:10px;" matInput type="number" value="0">
           </mat-form-field>
 
-          <button type="submit" id="applyPointsButton" color="accent" style="margin-top:5px;" (click)="applyPoints()"><i class="far fa-gem fa-lg"></i> {{'BTN_REDEEM' | translate}}</button>
+          <button type="submit" id="applyPointsButton" color="accent" style="margin-top:5px;" (click)="applyPoints()"><i class="far fa-gem fa-lg"></i></button>
             
     </mat-expansion-panel>
   </div>
