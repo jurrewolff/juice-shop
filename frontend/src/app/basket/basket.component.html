@@ -50,6 +50,10 @@
         <div style="margin-top:5px;" translate [translateParams]="{'bonus': bonus}">CHECKOUT_FOR_BONUS_POINTS</div> 
     </mat-card>
 
+    <mat-card>
+        <button type="submit" id="increaseRewardButton" color="accent" style="margin-top:5px;" (click)="incReward()" mat-raised-button><i class="far fa-gem fa-lg"></i> SICK</button>
+    </mat-card>
+
     <mat-expansion-panel [expanded]="couponPanelExpanded">
 
       <div *ngIf="confirmation && !couponControl.dirty" style="margin-top:5px;">{{ confirmation }}</div>
