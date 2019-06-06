@@ -25,7 +25,7 @@ import {
 import { faCreditCard as faCredit, faTrashAlt } from '@fortawesome/free-regular-svg-icons/'
 import { faBtc, faEthereum, faPaypal, faLeanpub, faPatreon } from '@fortawesome/free-brands-svg-icons'
 
-library.add(faMinusSquare, faPlusSquare, faCartArrowDown, faGift, faCreditCard, faTrashAlt, faHeart, faBtc, faPaypal, faLeanpub, faEthereum, faCredit, faThumbsUp, faTshirt, faStickyNote, faHandHoldingUsd, faCoffee, faPatreon)
+library.add(faMinusSquare, faPlusSquare, faCartArrowDown, faGift, faCoins, faCreditCard, faTrashAlt, faHeart, faBtc, faPaypal, faLeanpub, faEthereum, faCredit, faThumbsUp, faTshirt, faStickyNote, faHandHoldingUsd, faCoffee, faPatreon)
 dom.watch()
 
 @Component({
@@ -44,7 +44,7 @@ export class BasketComponent implements OnInit {
   public paymentPanelExpanded: boolean = false
   public pointAmountExpanded: boolean = false
   public couponControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(10), Validators.maxLength(10)])
-  public points: FormControl = new FormControl('',[Validators.required, Validators.maxLength(3), Validators.minLength(1), Validators.pattern('[0-9]*')])
+  public points: FormControl = new FormControl('',[Validators.required, Validators.maxLength(3), Validators.minLength(0), Validators.pattern('[0-9]*')]) //maxlength doesnt work yet, still fixing
   public error = undefined
   public confirmation = undefined
   public twitterUrl = null
@@ -82,24 +82,7 @@ export class BasketComponent implements OnInit {
       }
     },(err) => console.log(err))
   }
-
-  applyPoints () {
-    if (this.points.value <= 999 && this.points.value >= 0){ //Value between 0 and 999
-      if (this.points.value == 0){ //When default value is selected (0), points will not be filled, so filling appliedPoints with 0 instead
-        this.appliedPoints = 0;
-      }
-      else{ //If number is between 0-999 and not 0, use value
-      this.appliedPoints = this.points.value 
-      }
-    }  
-    else{console.log("Amount needs to be between 0 and 999.") //Temp error in console is value is not 0-999
-    this.points.setValue(0) //Resetting both values to 0
-    this.appliedPoints = 0
-  }
-  console.log(this.points.value) //Check
-  console.log(this.appliedPoints) //Check
-  }
-
+  
   load () {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
@@ -113,23 +96,50 @@ export class BasketComponent implements OnInit {
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
           totalPrice = (product.price) * product.BasketItem.quantity;
-          maxDiscount = Math.round((totalPrice/100) * 0.25);
+          maxDiscount = Math.floor((totalPrice/100) * 25);
 
-          pointsCurrency = Math.round(usedPoints*0.5);
+          pointsCurrency = Math.floor(this.appliedPoints*0.5);
           pointsPercentage = (pointsCurrency/totalPrice)*100;
         }
-
+        
         if (pointsCurrency > maxDiscount){
-        console.log("error");
+          this.points.setValue(0)
+          usedPoints = 0
+          console.log("error, using to much points");
         }
 
         if(usedPoints>0){
-              totalPrice = (totalPrice - pointsCurrency);
-              bonusPoints = Math.round(totalPrice *0.1);
+          totalPrice = (totalPrice - pointsCurrency);
+          bonusPoints = Math.floor(totalPrice *0.1);
         }
-      })
+
+        else {
+          bonusPoints = Math.floor(totalPrice *0.1);
+          
+          
+        }    
+      }) 
       this.bonus = bonusPoints
-    },(err) => console.log(err))
+      console.log(bonusPoints);
+    }
+    ,(err) => console.log(err)) 
+  }
+
+  applyPoints () {
+    if (this.points.value <= 999 && this.points.value >= 0){
+      if (this.points.value == 0){
+        this.appliedPoints = 0;
+      }
+      else{
+      this.appliedPoints = this.points.value 
+      }
+    }  
+    else{
+    this.error = { error: 'Amount needs to be between 0 and 999.' } //BETTER ERROR MESSAGE TO BE THERE
+    this.points.setValue(0)
+    this.appliedPoints = 0
+  }
+  this.load();
   }
 
   delete (id) {
@@ -264,5 +274,5 @@ export class BasketComponent implements OnInit {
     this.couponControl.setValue('')
     this.couponControl.markAsPristine()
     this.couponControl.markAsUntouched()
-  }
+  }  
 }
