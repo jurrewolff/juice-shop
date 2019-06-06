@@ -39,12 +39,13 @@ export class BasketComponent implements OnInit {
   public userEmail: string
   public displayedColumns = ['product','price','quantity','total price','remove']
   public dataSource = []
+  public currentRewardPoints: number
   public bonus = 0
   public couponPanelExpanded: boolean = false
   public paymentPanelExpanded: boolean = false
   public pointAmountExpanded: boolean = false
   public couponControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(10), Validators.maxLength(10)])
-  public points: FormControl = new FormControl('',[Validators.required, Validators.maxLength(3), Validators.minLength(0), Validators.pattern('[0-9]*')]) //maxlength doesnt work yet, still fixing
+  public points: FormControl = undefined  // Will be filled in load() as currentRewardPoints needs to be filled first
   public error = undefined
   public confirmation = undefined
   public twitterUrl = null
@@ -92,7 +93,14 @@ export class BasketComponent implements OnInit {
       let totalPrice = 0;
       let maxDiscount = 0;
       let usedPoints = this.appliedPoints;
-
+    this.userService.whoAmI().subscribe((user) => {
+      this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
+        this.currentRewardPoints = rewardPoints.amount;
+        this.points = new FormControl('',[Validators.required, Validators.maxLength(3), Validators.minLength(0), Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)]) //maxlength doesnt work yet, still fixing
+      })
+    })
+ 
+    
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
           totalPrice = (product.price) * product.BasketItem.quantity;
@@ -141,6 +149,7 @@ export class BasketComponent implements OnInit {
   }
   this.load();
   }
+
 
   delete (id) {
     this.basketService.del(id).subscribe(() => {
