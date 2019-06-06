@@ -227,6 +227,11 @@ app.use('/b2b/v2', insecurity.isAuthorized())
 /* Add item to basket */
 app.post('/api/BasketItems', basketItems())
 
+/* verify steal reward points challenge */
+app.get('/api/Rewards/:id', insecurity.isAuthorized())
+app.get('/api/Rewards/:id', verify.stealRewardPointChallenge())
+
+
 /* Verify the 2FA Token */
 app.post('/rest/2fa/verify',
   new RateLimit({ windowMs: 5 * 60 * 1000, max: 100 }),

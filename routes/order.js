@@ -74,7 +74,6 @@ module.exports = function placeOrder() {
           doc.moveDown()
           doc.font('Times-Roman', 15).text('Thank you for your order!')
           doc.end()
-
           if (utils.notSolved(challenges.negativeOrderChallenge) && totalPrice < 0) {
             utils.solve(challenges.negativeOrderChallenge)
           }
