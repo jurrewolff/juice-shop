@@ -127,9 +127,10 @@
     <mat-expansion-panel [expanded]="pointAmountExpanded">
         <mat-form-field>
             <label><small>You have {{currentRewardPoints}} bonus point(s) available</small></label>
-            <input pattern="[0-9]*" id="points" [formControl]="points" style="margin-top:10px;" matInput type="number" value="0" max={{currentRewardPoints}}>
+            <input pattern="[0-9]*" id="points" [formControl]="points" style="margin-top:10px;" matInput type="number" max={{currentRewardPoints}}>
           </mat-form-field>
+          <small><mat-error *ngIf="points.invalid" translate>INVALID_REWARD_POINT_VALUE</mat-error></small>
           <button type="submit" id="applyPointsButton" color="accent" style="margin-top:5px;" (click)="applyPoints()" [disabled]="points.invalid" mat-raised-button><i class="far fa-gem fa-lg"></i>{{'BTN_APPLY' | translate}}</button>    
-    </mat-expansion-panel>
+        </mat-expansion-panel>
   </div>
 </div>

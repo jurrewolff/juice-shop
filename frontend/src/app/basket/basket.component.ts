@@ -92,7 +92,7 @@ export class BasketComponent implements OnInit {
     this.userService.whoAmI().subscribe((user) => {
       this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
         this.currentRewardPoints = rewardPoints.amount;
-        this.points = new FormControl('',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
+        this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
       })
     })
  

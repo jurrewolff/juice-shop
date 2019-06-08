@@ -15,6 +15,7 @@ module.exports = function placeOrder() {
     models.Basket.findOne({ where: { id }, include: [{ model: models.Product, paranoid: false }] })
       .then(basket => {
         if (basket) {
+          userId = basket.UserId
           appliedPoints = basket.appliedPoints
           const customer = insecurity.authenticatedUsers.from(req)
           const email = customer ? customer.data ? customer.data.email : '' : ''
@@ -58,7 +59,6 @@ module.exports = function placeOrder() {
             doc.moveDown()
             totalPrice += itemTotal
           })
-          totalPoints = Math.floor(totalPrice / 10)
           doc.moveDown()
           const discount = calculateApplicableDiscount(basket, req)
           if (discount > 0) {
@@ -67,15 +67,16 @@ module.exports = function placeOrder() {
             doc.moveDown()
             totalPrice -= discountAmount
           }
-          if (totalPoints > 0) {
+          if (this.appliedPoints > 0) {
             const rewardDiscountAmount = (this.appliedPoints *  0.5)
-            doc.text('Used ' + this.appliedPoints + ' reward point(s) for a discount of ' + rewardDiscountAmount)
+            doc.font('Times-Italic', 15).text('Used ' + this.appliedPoints + ' reward point(s) for a discount of ' + rewardDiscountAmount)
             doc.moveDown()
             totalPrice -= rewardDiscountAmount
           }
+          totalPoints = Math.floor(totalPrice / 10)
           doc.font('Helvetica-Bold', 20).text('Total Price: ' + totalPrice.toFixed(2))
           doc.moveDown()
-          doc.font('Helvetica-Bold', 15).text('Bonus Points Earned: ' + totalPoints)
+          doc.font('Helvetica-Bold', 15).text('Bonus Point(s) Earned: ' + totalPoints)
           doc.font('Times-Roman', 15).text('(You are able to use these points for discount!)')
           doc.moveDown()
           doc.moveDown()
@@ -97,8 +98,10 @@ module.exports = function placeOrder() {
 
           fileWriter.on('finish', () => {
             basket.update({ coupon: null })
+            basket.update({ appliedPoints: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
-            models.Reward.create({amount: totalPoints, UserId: id })
+            //models.Reward.update({ amount: totalPrice})
+            //models.Reward.create({amount: totalPoints, UserId: id })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {
