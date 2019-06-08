@@ -1,7 +1,8 @@
 /* jslint node: true */
-module.exports = (sequelize, { STRING }) => {
+module.exports = (sequelize, { STRING, INTEGER }) => {
   const Basket = sequelize.define('Basket', {
-    coupon: STRING
+    coupon: STRING,
+    appliedPoints: INTEGER
   })
 
   Basket.associate = ({ User, Product, BasketItem }) => {

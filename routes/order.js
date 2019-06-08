@@ -15,6 +15,7 @@ module.exports = function placeOrder() {
     models.Basket.findOne({ where: { id }, include: [{ model: models.Product, paranoid: false }] })
       .then(basket => {
         if (basket) {
+          appliedPoints = basket.appliedPoints
           const customer = insecurity.authenticatedUsers.from(req)
           const email = customer ? customer.data ? customer.data.email : '' : ''
           const orderId = insecurity.hash(email).slice(0, 4) + '-' + utils.randomHexString(16)
@@ -44,20 +45,20 @@ module.exports = function placeOrder() {
             }
 
             const itemTotal = price * BasketItem.quantity
-            const itemBonus = Math.round(price / 10) * BasketItem.quantity
+            //const itemBonus = Math.round(price / 10) * BasketItem.quantity
             const product = {
               quantity: BasketItem.quantity,
               name: name,
               price: price,
               total: itemTotal,
-              bonus: itemBonus
+              //bonus: itemBonus
             }
             basketProducts.push(product)
             doc.text(BasketItem.quantity + 'x ' + name + ' ea. ' + price + ' = ' + itemTotal)
             doc.moveDown()
             totalPrice += itemTotal
-            totalPoints += itemBonus
           })
+          totalPoints = Math.floor(totalPrice / 10)
           doc.moveDown()
           const discount = calculateApplicableDiscount(basket, req)
           if (discount > 0) {
@@ -66,10 +67,16 @@ module.exports = function placeOrder() {
             doc.moveDown()
             totalPrice -= discountAmount
           }
+          if (totalPoints > 0) {
+            const rewardDiscountAmount = (this.appliedPoints *  0.5)
+            doc.text('Used ' + this.appliedPoints + ' reward point(s) for a discount of ' + rewardDiscountAmount)
+            doc.moveDown()
+            totalPrice -= rewardDiscountAmount
+          }
           doc.font('Helvetica-Bold', 20).text('Total Price: ' + totalPrice.toFixed(2))
           doc.moveDown()
           doc.font('Helvetica-Bold', 15).text('Bonus Points Earned: ' + totalPoints)
-          doc.font('Times-Roman', 15).text('(You will be able to these points for amazing bonuses in the future!)')
+          doc.font('Times-Roman', 15).text('(You are able to use these points for discount!)')
           doc.moveDown()
           doc.moveDown()
           doc.font('Times-Roman', 15).text('Thank you for your order!')

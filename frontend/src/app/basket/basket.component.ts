@@ -39,7 +39,7 @@ export class BasketComponent implements OnInit {
   public userEmail: string
   public displayedColumns = ['product','price','quantity','total price','remove']
   public dataSource = []
-  public currentRewardPoints: number
+  public currentRewardPoints = 0;
   public bonus = 0
   public couponPanelExpanded: boolean = false
   public paymentPanelExpanded: boolean = false
@@ -88,15 +88,11 @@ export class BasketComponent implements OnInit {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
       let bonusPoints = 0
-      let pointsCurrency = 0;
-      let pointsPercentage = 0;
       let totalPrice = 0;
-      let maxDiscount = 0;
-      let usedPoints = this.appliedPoints;
     this.userService.whoAmI().subscribe((user) => {
       this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
         this.currentRewardPoints = rewardPoints.amount;
-        this.points = new FormControl('',[Validators.required, Validators.maxLength(3), Validators.minLength(0), Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)]) //maxlength doesnt work yet, still fixing
+        this.points = new FormControl('',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
       })
     })
  
@@ -104,52 +100,23 @@ export class BasketComponent implements OnInit {
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
           totalPrice = (product.price) * product.BasketItem.quantity;
-          maxDiscount = Math.floor((totalPrice/100) * 25);
-
-          pointsCurrency = Math.floor(this.appliedPoints*0.5);
-          pointsPercentage = (pointsCurrency/totalPrice)*100;
         }
-        
-        if (pointsCurrency > maxDiscount){
-          this.points.setValue(0)
-          usedPoints = 0
-          console.log("error, using to much points");
-        }
-
-        if(usedPoints>0){
-          totalPrice = (totalPrice - pointsCurrency);
-          bonusPoints = Math.floor(totalPrice *0.1);
-        }
-
-        else {
-          bonusPoints = Math.floor(totalPrice *0.1);
-          
-          
-        }    
+  
       }) 
-      this.bonus = bonusPoints
-      console.log(bonusPoints);
     }
     ,(err) => console.log(err)) 
   }
 
   applyPoints () {
-    if (this.points.value <= 999 && this.points.value >= 0){
-      if (this.points.value == 0){
-        this.appliedPoints = 0;
+    this.appliedPoints = this.points.value
+    if (this.appliedPoints > 0) {
+      this.basketService.applyPoints(sessionStorage.getItem('bid'), this.appliedPoints).subscribe((data) => {
+        console.log(data)
+      },(err) => {
+        console.log(err)
+      })
+    }
       }
-      else{
-      this.appliedPoints = this.points.value 
-      }
-    }  
-    else{
-    this.error = { error: 'Amount needs to be between 0 and 999.' } //BETTER ERROR MESSAGE TO BE THERE
-    this.points.setValue(0)
-    this.appliedPoints = 0
-  }
-  this.load();
-  }
-
 
   delete (id) {
     this.basketService.del(id).subscribe(() => {
@@ -184,7 +151,6 @@ export class BasketComponent implements OnInit {
     this.basketService.getBonus(id).subscribe((data) => {
       let newBonus = data.amount + value
       this.basketService.putBonus(id, { amount: newBonus }).subscribe((data) => {
-        console.log(data.amount)
         this.load()
       },(err) => console.log(err))
     }, (err) => console.log(err))
@@ -207,6 +173,11 @@ export class BasketComponent implements OnInit {
 
   checkout () {
     this.basketService.checkout(sessionStorage.getItem('bid'), btoa(this.campaignCoupon + '-' + this.clientDate)).subscribe((orderConfirmationPath) => {
+      if (this.appliedPoints > 0) {
+        this.userService.whoAmI().subscribe((user) => {
+          this.addToReward(user.id, (this.appliedPoints * -1)) // Make appliedPoints negative to substract the amount from reward points of user
+        })
+      }
       this.redirectUrl = this.basketService.hostServer + orderConfirmationPath
       this.windowRefService.nativeWindow.location.replace(this.redirectUrl)
     }, (err) => console.log(err))
