@@ -41,6 +41,7 @@ export class BasketComponent implements OnInit {
   public dataSource = []
   public currentRewardPoints = 0;
   public bonus = 0
+  public bonusBalance = 0
   public couponPanelExpanded: boolean = false
   public paymentPanelExpanded: boolean = false
   public pointAmountExpanded: boolean = false
@@ -63,6 +64,10 @@ export class BasketComponent implements OnInit {
     this.userService.whoAmI().subscribe((data) => {
       this.userEmail = data.email || 'anonymous'
       this.userEmail = '(' + this.userEmail + ')'
+
+      this.basketService.getBonus(data.id).subscribe((bonusData) => {
+        this.bonusBalance = bonusData.amount
+      },(err) => console.log(err))
     },(err) => console.log(err))
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false

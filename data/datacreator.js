@@ -33,7 +33,8 @@ module.exports = async () => {
     createAnonymousFeedback,
     createComplaints,
     createRecycleItems,
-    createOrders
+    createOrders,
+    createRewardItems
   ]
 
   for (const creator of creators) {
@@ -463,3 +464,33 @@ function createOrders () {
     )
   )
 }
+
+function createRewardItems () {
+  models.User.count().then(userCount => {
+  const rewards = [
+    {
+      UserId: 1,
+      amount: 100
+    },
+    {
+      UserId: 2,
+      amount: 12
+    }
+  ]
+  for (let i = 3; i <= userCount; i++){
+     rewards.push({
+       UserId: i,
+       amount: 0
+     })
+  }
+  return Promise.all(
+    rewards.map((item) => createRewards(item))
+  )
+})}
+
+function createRewards (item) {
+  return models.Reward.create(item).catch((err) => {
+    logger.error(`Could not insert Reward Model: ${err.message}`)
+  })
+}
+
