@@ -93,34 +93,57 @@ export class BasketComponent implements OnInit {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
       let bonusPoints = 0
-      let totalPrice = 0;
+      var totalPrice = 0;
     this.userService.whoAmI().subscribe((user) => {
       this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
         this.currentRewardPoints = rewardPoints.amount;
         this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
+        
+        let basketProducts = []
+      basket.Products.forEach(({ BasketItem, price, name }) => {
+          const itemTotal = (price) * BasketItem.quantity
+          const product = {
+            quantity: BasketItem.quantity,
+            name: name,
+            price: price,
+            total: itemTotal,   
+        }
+      basketProducts.push(product)
+      totalPrice += itemTotal
+
+      let usedPoints = this.appliedPoints * 0.5
+      if(usedPoints > 0 ){
+        totalPrice = (totalPrice - usedPoints)
+        this.bonus = Math.floor(totalPrice * 0.1)
+      }
+      else {
+        this.bonus = Math.floor(totalPrice * 0.1)
+      }
+       
       })
     })
  
     
-      basket.Products.map(product => {
-        if (product.BasketItem && product.BasketItem.quantity) {
-          totalPrice = (product.price) * product.BasketItem.quantity;
-        }
-  
+      
+  console.log(totalPrice)
       }) 
     }
     ,(err) => console.log(err)) 
   }
 
   applyPoints () {
+    
     this.appliedPoints = this.points.value
-    if (this.appliedPoints > 0) {
+    if (this.appliedPoints > 0 ) {
       this.basketService.applyPoints(sessionStorage.getItem('bid'), this.appliedPoints).subscribe((data) => {
         console.log(data)
       },(err) => {
         console.log(err)
       })
+      
+      
     }
+    this.load()
       }
 
   delete (id) {
