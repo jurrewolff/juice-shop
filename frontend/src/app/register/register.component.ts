@@ -52,13 +52,12 @@ export class RegisterComponent implements OnInit {
     }
 
     const reward = { 
-      amount: 0 // Default value, new accounts have 0 bonus points
+      amount: 0
     }
 
     this.userService.save(user).subscribe((response: any) => {
       this.securityAnswerService.save({UserId: response.id, answer: this.securityAnswerControl.value,
         SecurityQuestionId: this.securityQuestionControl.value}).subscribe(() => {
-          // Reward stuff here
           this.basketService.postBonus({amount: reward.amount, UserId: response.id}).subscribe(() => {
             this.router.navigate(['/login'])
           })          

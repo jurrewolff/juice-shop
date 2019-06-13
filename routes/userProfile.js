@@ -15,7 +15,7 @@ module.exports = function getUserProfile () {
       const loggedInUser = insecurity.authenticatedUsers.get(req.cookies.token)
       if (loggedInUser) {
         models.User.findByPk(loggedInUser.data.id).then(user => {
-          models.Reward.findOne({ where: { userId: loggedInUser.data.id } }).then(bonus => { // Find reward model for user
+          models.Reward.findOne({ where: { userId: loggedInUser.data.id } }).then(bonus => {
 
             let jadeTemplate = buf.toString()
             let username = user.dataValues.username
@@ -24,7 +24,7 @@ module.exports = function getUserProfile () {
               req.app.locals.abused_ssti_bug = true
               const code = username.substring(2, username.length - 1)
               try {
-                eval(code) // eslint-disable-line no-eval
+                eval(code)
               } catch (err) {
                 username = '\\' + username
               }
@@ -39,7 +39,7 @@ module.exports = function getUserProfile () {
             jadeTemplate = jadeTemplate.replace(/_bgColor_/g, theme.bgColor)
             jadeTemplate = jadeTemplate.replace(/_textColor_/g, theme.textColor)
             jadeTemplate = jadeTemplate.replace(/_navColor_/g, theme.navColor)
-            jadeTemplate = jadeTemplate.replace(/_bonusHash_/g, bonusBalance) // Reward model provides bonusBalance
+            jadeTemplate = jadeTemplate.replace(/_bonusHash_/g, bonusBalance)
             const fn = jade.compile(jadeTemplate)
             res.send(fn(user.dataValues))
 
