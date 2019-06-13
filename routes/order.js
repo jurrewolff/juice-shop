@@ -9,13 +9,13 @@ const challenges = require('../data/datacache').challenges
 const config = require('config')
 const db = require('../data/mongodb')
 
+
 module.exports = function placeOrder() {
   return (req, res, next) => {
     const id = req.params.id
     models.Basket.findOne({ where: { id }, include: [{ model: models.Product, paranoid: false }] })
       .then(basket => {
         if (basket) {
-          userId = basket.UserId
           appliedPoints = basket.appliedPoints
           const customer = insecurity.authenticatedUsers.from(req)
           const email = customer ? customer.data ? customer.data.email : '' : ''
@@ -99,7 +99,9 @@ module.exports = function placeOrder() {
             basket.update({ coupon: null })
             basket.update({ appliedPoints: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
-            //models.Reward.update({ amount: totalPrice})
+            models.Reward.findOne({ where: {UserId: customer.data.id} }).then(reward => {
+              models.Reward.update({amount: (reward.amount + (totalPoints - this.appliedPoints))}, { where: { UserId: customer.data.id}})
+            })
             //models.Reward.create({amount: totalPoints, UserId: id })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
