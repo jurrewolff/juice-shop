@@ -43,41 +43,6 @@ exports.registerAdminChallenge = () => (req, res, next) => {
   next()
 }
 
-exports.extraRewardOnCheckoutChallenge = () => (req, res, next) => {
-  const user = insecurity.authenticatedUsers.from(req)
-  const userId = user && user.data ? user.data.id : undefined
-  
-  let currentRewardBalance = 0
-  let supposedReward = 0
-  let requestReward = 0
-  let totalProductPrice = 0
-  let totalBasketPrice = 0
-  let count = 0
-
-  models.Reward.findOne({where: {UserId: userId}}).then(rewardData => {
-    currentRewardBalance = rewardData.amount
-    models.BasketItem.findAndCountAll({where: {BasketId: userId}}).then(items => {
-      items.rows.forEach(item => {
-        models.Product.findOne({where: {id: item.ProductId}}).then(product => {
-          totalProductPrice = product.price * item.quantity
-          totalBasketPrice += totalProductPrice
-          count += 1
-          if (count == items.count) {
-            supposedReward = Math.floor(totalBasketPrice / 10)  // TODO - Formula used for calculating bonus points has to be updated.
-            requestReward = req.body.amount - currentRewardBalance
-            if (utils.notSolved(challenges.extraRewardOnCheckoutChallenge)) {
-              if (requestReward >= supposedReward) {
-                utils.solve(challenges.extraRewardOnCheckoutChallenge)
-              }
-            }
-            next()
-          }
-        })
-      })
-    })
-  })
-}
-
 exports.passwordRepeatChallenge = () => (req, res, next) => {
   if (utils.notSolved(challenges.passwordRepeatChallenge)) {
     if (req.body && req.body.passwordRepeat !== req.body.password) {

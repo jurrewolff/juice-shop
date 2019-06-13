@@ -45,6 +45,7 @@ module.exports = function placeOrder() {
 
             const itemTotal = price * BasketItem.quantity
             const itemBonus = Math.round(price / 10) * BasketItem.quantity
+            this.itemBonus = itemBonus
             const product = {
               quantity: BasketItem.quantity,
               name: name,
@@ -58,6 +59,14 @@ module.exports = function placeOrder() {
             totalPrice += itemTotal
             totalPoints += itemBonus
           })
+          models.Reward.findOne({where: {UserId: customer.data.id}}).then(rewardData => {
+            const currentRewardBalance = rewardData.amount
+              const requestReward = req.body.amount - currentRewardBalance
+              if (utils.notSolved(challenges.extraRewardOnCheckoutChallenge) && requestReward > itemBonus){
+            utils.solve(challenges.extraRewardOnCheckoutChallenge)
+          }
+            })
+
           doc.moveDown()
           const discount = calculateApplicableDiscount(basket, req)
           if (discount > 0) {
