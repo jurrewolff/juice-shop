@@ -53,4 +53,7 @@ export class BasketService {
     return this.http.get(this.hostServer + '/api/Rewards/' + id).pipe(map((response: any) => response.data), catchError((error) => { throw error }))
   }
 
+  postBonus (params) {
+    return this.http.post(this.hostServer + '/api/Rewards/', params).pipe(map((response: any) => response.data), catchError((error) => { throw error }))
+  }
 }
