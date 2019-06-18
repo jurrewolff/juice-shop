@@ -100,6 +100,7 @@ export class BasketComponent implements OnInit {
       })
     })
       let basketProducts = []
+      let usedPoints = this.appliedPoints * 0.5
       basket.Products.forEach(({ BasketItem, price, name }) => {
           const itemTotal = (price) * BasketItem.quantity
           const product = {
@@ -110,8 +111,8 @@ export class BasketComponent implements OnInit {
         }
       basketProducts.push(product)
       totalPrice += itemTotal
-
-      let usedPoints = this.appliedPoints * 0.5
+      })
+      this.maxDiscountPoints = Math.floor(2* (totalPrice * 0.25)); 
       if(usedPoints > 0 ){
         totalPrice = (totalPrice - usedPoints)
         this.bonus = Math.floor(totalPrice * 0.1)
@@ -119,21 +120,12 @@ export class BasketComponent implements OnInit {
       else {
         this.bonus = Math.floor(totalPrice * 0.1)
       }
-      this.maxDiscountPoints = Math.floor(2* (totalPrice * 0.25));      
-      })
-    
-      basket.Products.map(product => {
-        if (product.BasketItem && product.BasketItem.quantity) {
-          totalPrice = (product.price) * product.BasketItem.quantity;
-        }
-      })
-
+              
     }
     ,(err) => console.log(err)) 
   }
 
   applyPoints () {
-    
     this.appliedPoints = this.points.value
     if (this.appliedPoints > 0 ) {
       this.basketService.applyPoints(sessionStorage.getItem('bid'), this.appliedPoints).subscribe((data) => {
