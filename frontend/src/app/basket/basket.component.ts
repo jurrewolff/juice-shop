@@ -40,6 +40,7 @@ export class BasketComponent implements OnInit {
   public displayedColumns = ['product','price','quantity','total price','remove']
   public dataSource = []
   public currentRewardPoints = 0;
+  public maxDiscountPoints = 0;
   public bonus = 0
   public bonusBalance = 0
   public couponPanelExpanded: boolean = false
@@ -95,6 +96,7 @@ export class BasketComponent implements OnInit {
       this.dataSource = basket.Products
       let bonusPoints = 0
       let totalPrice = 0;
+      this.maxDiscountPoints = 0;
     this.userService.whoAmI().subscribe((user) => {
       this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
         this.currentRewardPoints = rewardPoints.amount;
@@ -106,9 +108,10 @@ export class BasketComponent implements OnInit {
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
           totalPrice = (product.price) * product.BasketItem.quantity;
+          this.maxDiscountPoints += Math.floor(2* (totalPrice * 0.25));
         }
-  
-      }) 
+      })
+
     }
     ,(err) => console.log(err)) 
   }
@@ -179,11 +182,6 @@ export class BasketComponent implements OnInit {
 
   checkout () {
     this.basketService.checkout(sessionStorage.getItem('bid'), btoa(this.campaignCoupon + '-' + this.clientDate)).subscribe((orderConfirmationPath) => {
-      if (this.appliedPoints > 0) {
-        this.userService.whoAmI().subscribe((user) => {
-          this.addToReward(user.id, (this.appliedPoints * -1)) // Make appliedPoints negative to substract the amount from reward points of user
-        })
-      }
       this.redirectUrl = this.basketService.hostServer + orderConfirmationPath
       this.windowRefService.nativeWindow.location.replace(this.redirectUrl)
     }, (err) => console.log(err))

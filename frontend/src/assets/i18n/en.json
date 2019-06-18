@@ -135,6 +135,7 @@
   "MANDATORY_SECURITY_ANSWER": "Please provide an answer to your security question.",
   "INVALID_REWARD_POINT_VALUE": "Not quite there yet, keep saving those precious points!",
   "INVALID_REWARD_POINT_CHAR": "No no no, only positive numbers are allowed!",
+  "INVALID_REWARD_POINT_AMOUNT": "We're sorry, you can only use points up to 25% discount.",
   "POINTS_APPLIED": "Your discount of {{points}} points will be applied during checkout.",
   "FORGOT_PASSWORD": "Forgot your password?",
   "TITLE_FORGOT_PASSWORD": "Forgot Password",

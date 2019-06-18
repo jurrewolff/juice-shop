@@ -102,7 +102,6 @@ module.exports = function placeOrder() {
             models.Reward.findOne({ where: {UserId: customer.data.id} }).then(reward => {
               models.Reward.update({amount: (reward.amount + (totalPoints - this.appliedPoints))}, { where: { UserId: customer.data.id}})
             })
-            //models.Reward.create({amount: totalPoints, UserId: id })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {
