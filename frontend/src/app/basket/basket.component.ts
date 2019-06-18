@@ -66,10 +66,6 @@ export class BasketComponent implements OnInit {
     this.userService.whoAmI().subscribe((data) => {
       this.userEmail = data.email || 'anonymous'
       this.userEmail = '(' + this.userEmail + ')'
-
-      this.basketService.getBonus(data.id).subscribe((bonusData) => {
-        this.bonusBalance = bonusData.amount
-      },(err) => console.log(err))
     },(err) => console.log(err))
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false
@@ -123,14 +119,12 @@ export class BasketComponent implements OnInit {
       else {
         this.bonus = Math.floor(totalPrice * 0.1)
       }
-      console.log(totalPrice)
-       
+      this.maxDiscountPoints = Math.floor(2* (totalPrice * 0.25));      
       })
     
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
           totalPrice = (product.price) * product.BasketItem.quantity;
-          this.maxDiscountPoints += Math.floor(2* (totalPrice * 0.25));
         }
       })
 
