@@ -97,12 +97,13 @@ export class BasketComponent implements OnInit {
       this.maxDiscountPoints = 0;
       let bonusPoints = 0
       let totalPrice = 0;
-      let basketProducts = []
     this.userService.whoAmI().subscribe((user) => {
       this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
         this.currentRewardPoints = rewardPoints.amount;
         this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
       })
+    })
+      let basketProducts = []
       basket.Products.forEach(({ BasketItem, price, name }) => {
           const itemTotal = (price) * BasketItem.quantity
           const product = {
@@ -122,10 +123,9 @@ export class BasketComponent implements OnInit {
       else {
         this.bonus = Math.floor(totalPrice * 0.1)
       }
+      console.log(totalPrice)
        
       })
-    })
- 
     
       basket.Products.map(product => {
         if (product.BasketItem && product.BasketItem.quantity) {
