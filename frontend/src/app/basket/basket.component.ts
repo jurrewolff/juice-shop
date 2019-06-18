@@ -144,7 +144,7 @@ export class BasketComponent implements OnInit {
     localStorage.setItem('paymentPanelExpanded',JSON.stringify(this.paymentPanelExpanded))
   }
 
-  checkout () { // Het idee is vgm dat wanneer er op checkout wordt gedrukt de putBonus functie wordt aangeroepen die dan de punten verhoogt. 
+  checkout () {
     this.basketService.checkout(sessionStorage.getItem('bid'), btoa(this.campaignCoupon + '-' + this.clientDate)).subscribe((orderConfirmationPath) => {
       this.redirectUrl = this.basketService.hostServer + orderConfirmationPath
       this.windowRefService.nativeWindow.location.replace(this.redirectUrl)
