@@ -45,8 +45,8 @@
 
     <mat-card>
         <button id="checkoutButton" class="checkout-button" color="primary" [disabled]="!dataSource || dataSource.length < 1" (click)="checkout()" mat-raised-button><i class="fas fa-cart-arrow-down"></i> {{"BTN_CHECKOUT" | translate}}</button>
-        <mat-button-toggle id="collapseCouponButton" class="coupon-toggle" (change)="toggleCoupon()" [checked]="couponPanelExpanded" style="margin-left:10px"><i class="fas fa-gift fa-lg"></i></mat-button-toggle>
-        <mat-button-toggle id="pointAmountButton" class="point-toggle" (change)="togglePoint()" [checked]="pointAmountExpanded" style="margin-right:10px;margin-left:10px"><i class="fas fa-coins fa-lg"></i></mat-button-toggle>
+        <mat-button-toggle id="collapseCouponButton" class="coupon-toggle" (change)="toggleCoupon()" [checked]="couponPanelExpanded" style="margin-left:10px; margin-right: 10px;"><i class="fas fa-gift fa-lg"></i></mat-button-toggle>
+        <mat-button-toggle id="pointAmountButton" class="point-toggle" *ngIf="currentRewardPoints > 0" (change)="togglePoint()" [checked]="pointAmountExpanded" style="margin-right:10px;"><i class="fas fa-coins fa-lg"></i></mat-button-toggle>
         <mat-button-toggle id="paymentCouponButton" class="payment-toggle" (change)="togglePayment()" [checked]="paymentPanelExpanded"><i class="fas fa-credit-card fa-lg"></i></mat-button-toggle>
         <div style="margin-top:5px;" translate [translateParams]="{'bonus': bonus}">CHECKOUT_FOR_BONUS_POINTS</div>
     </mat-card>
@@ -62,7 +62,8 @@
       <button type="submit" id="applyCouponButton" color="accent" style="margin-top:5px;" (click)="applyCoupon()" [disabled]="couponControl.invalid" mat-raised-button><i class="far fa-gem fa-lg"></i> {{'BTN_REDEEM' | translate}}</button>
     </mat-expansion-panel>
 
-    <mat-expansion-panel [expanded]="pointAmountExpanded">
+    <mat-expansion-panel [expanded]="pointAmountExpanded" *ngIf="currentRewardPoints > 0">
+        <div *ngIf="confirmationPoints && !points.dirty" style="margin-top:5px;">{{ confirmationPoints }}</div>
       <mat-form-field>
           <label><small>You have {{currentRewardPoints}} bonus point(s) available</small></label>
           <input pattern="[0-9]*" id="points" [formControl]="points" style="margin-top:10px;" matInput type="number" max={{currentRewardPoints}}>
