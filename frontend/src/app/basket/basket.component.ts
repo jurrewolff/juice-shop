@@ -49,6 +49,7 @@ export class BasketComponent implements OnInit {
   public points: FormControl = undefined  // Will be filled in load() as currentRewardPoints needs to be filled first
   public error = undefined
   public confirmation = undefined
+  public confirmationPoints = undefined
   public twitterUrl = null
   public facebookUrl = null
   public applicationName = 'OWASP Juice Shop'
@@ -136,7 +137,7 @@ export class BasketComponent implements OnInit {
     this.appliedPoints = this.points.value
     if (this.appliedPoints > 0 ) {
       this.basketService.applyPoints(sessionStorage.getItem('bid'), this.appliedPoints).subscribe((data) => {
-        console.log(data)
+        this.showConfirmationPoints(this.appliedPoints)
       },(err) => {
         console.log(err)
       })
@@ -242,6 +243,18 @@ export class BasketComponent implements OnInit {
       this.confirmation = discountApplied
     }, (translationId) => {
       this.confirmation = translationId
+    })
+  }
+
+  showConfirmationPoints (points) {
+    this.points.reset()
+    this.points.markAsPristine()
+    this.points.markAsUntouched()
+    this.error = undefined
+    this.translate.get('POINTS_APPLIED', { points }).subscribe((discountPointsApplied) => {
+      this.confirmationPoints = discountPointsApplied
+    }, (translationId) => {
+      this.confirmationPoints = translationId
     })
   }
 
