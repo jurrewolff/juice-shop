@@ -229,7 +229,6 @@ app.use('/b2b/v2', insecurity.isAuthorized())
 app.post('/api/BasketItems', basketItems())
 
 /* verify steal reward points challenge */
-app.get('/api/Rewards/:id', insecurity.isAuthorized())
 app.get('/api/Rewards/:id', verify.stealRewardPointChallenge())
 
 /* Add applied reward points*/ 
