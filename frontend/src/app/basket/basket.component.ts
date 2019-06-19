@@ -37,6 +37,7 @@ dom.watch()
 export class BasketComponent implements OnInit {
 
   public userEmail: string
+  public userId: number
   public displayedColumns = ['product','price','quantity','total price','remove']
   public dataSource = []
   public currentRewardPoints = 0;
@@ -62,10 +63,15 @@ export class BasketComponent implements OnInit {
   constructor (private dialog: MatDialog,private basketService: BasketService,private userService: UserService,private windowRefService: WindowRefService,private configurationService: ConfigurationService,private translate: TranslateService) {}
 
   ngOnInit () {
-    this.load()
     this.userService.whoAmI().subscribe((data) => {
       this.userEmail = data.email || 'anonymous'
       this.userEmail = '(' + this.userEmail + ')'
+      this.userId = data.id
+      this.basketService.getBonus(data.id).subscribe((rewardPoints) => {
+        this.currentRewardPoints = rewardPoints.amount;
+        this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
+        this.load()
+      })
     },(err) => console.log(err))
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false
@@ -93,14 +99,9 @@ export class BasketComponent implements OnInit {
       this.maxDiscountPoints = 0;
       let bonusPoints = 0
       let totalPrice = 0;
-    this.userService.whoAmI().subscribe((user) => {
-      this.basketService.getBonus(user.id).subscribe((rewardPoints) => {
-        this.currentRewardPoints = rewardPoints.amount;
-        this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
-      })
-    })
       let basketProducts = []
       let usedPoints = this.appliedPoints * 0.5
+
       basket.Products.forEach(({ BasketItem, price, name }) => {
           const itemTotal = (price) * BasketItem.quantity
           const product = {
@@ -108,11 +109,17 @@ export class BasketComponent implements OnInit {
             name: name,
             price: price,
             total: itemTotal,   
-        }
-      basketProducts.push(product)
-      totalPrice += itemTotal
+          } 
+        basketProducts.push(product)
+        totalPrice += itemTotal
       })
+
       this.maxDiscountPoints = Math.floor(2* (totalPrice * 0.25)); 
+
+      if(this.maxDiscountPoints > this.currentRewardPoints){
+        this.maxDiscountPoints = this.currentRewardPoints
+      }
+
       if(usedPoints > 0 ){
         totalPrice = (totalPrice - usedPoints)
         this.bonus = Math.floor(totalPrice * 0.1)

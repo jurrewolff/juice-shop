@@ -65,7 +65,7 @@
     <mat-expansion-panel [expanded]="pointAmountExpanded" *ngIf="currentRewardPoints > 0">
         <div *ngIf="confirmationPoints && !points.dirty" style="margin-top:5px;">{{ confirmationPoints }}</div>
       <mat-form-field>
-          <label><small>You have {{currentRewardPoints}} bonus point(s) available, you can use up to {{maxDiscountPoints}} bonus point(s) for this order.</small></label>
+          <label><small> You have {{currentRewardPoints}} bonus point(s) available, you can use up to {{maxDiscountPoints}} bonus point(s) for this order.</small></label>
           <input pattern="[0-9]*" id="points" [formControl]="points" style="margin-top:10px;" matInput type="number" max={{maxDiscountPoints}}>
         </mat-form-field>
         <small><mat-error *ngIf="points.invalid && points.errors.max" (focus)="this.error=null" translate>INVALID_REWARD_POINT_VALUE</mat-error></small>
