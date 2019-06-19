@@ -49,6 +49,8 @@
   "LABEL_PRODUCT": "Artikel",
   "LABEL_PRODUCT_ORDERED": "Bestelde producten",
   "LABEL_EXPECTED_DELIVERY": "Verwachte levering",
+  "BONUS_POINTS_TEXT": "Je kunt deze punten gebruiken voor een geweldige korting!",
+  "BONUS_POINTS_EARNED": "Bonus punten verdiend: {{results.bonus}}",
   "LABEL_DAYS": "Dagen",
   "LABEL_NAME": "Naam",
   "LABEL_DESCRIPTION": "Beschrijving",
