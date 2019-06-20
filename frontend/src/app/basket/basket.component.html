@@ -71,7 +71,7 @@
         <small><mat-error *ngIf="points.invalid && points.errors.max" (focus)="this.error=null" translate>INVALID_REWARD_POINT_VALUE</mat-error></small>
         <small><mat-error *ngIf="points.invalid && !points.errors.max && (points.value != null)" (focus)="this.error=null" translate>INVALID_REWARD_POINT_CHAR</mat-error></small>
         <small><mat-error *ngIf="!points.invalid && (points.value > maxDiscountPoints)" (focus)="this.error=null" translate>INVALID_REWARD_POINT_AMOUNT</mat-error></small>
-        <button type="submit" id="applyPointsButton" color="accent" style="margin-top:5px;" (click)="applyPoints()" [disabled]="points.invalid || !points.invalid && (points.value > maxDiscountPoints)" mat-raised-button><i class="far fa-gem fa-lg"></i> {{'BTN_APPLY' | translate}}</button>    
+        <button type="submit" id="applyPointsButton" color="accent" style="margin-top:5px;" (click)="applyPoints()" [disabled]="points.invalid || !points.invalid && ((points.value > maxDiscountPoints) || (points.value == 0))" mat-raised-button><i class="far fa-gem fa-lg"></i> {{'BTN_APPLY' | translate}}</button>    
       </mat-expansion-panel>
 
     <mat-expansion-panel [expanded]="paymentPanelExpanded">
