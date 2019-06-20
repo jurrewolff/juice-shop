@@ -40,12 +40,15 @@ module.exports = function placeOrder() {
           let totalPrice = 0
           let basketProducts = []
           let totalPoints = 0
+          let maxDiscountPoints = 0
           basket.Products.forEach(({ BasketItem, price, name }) => {
             if (utils.notSolved(challenges.christmasSpecialChallenge) && BasketItem.ProductId === products.christmasSpecial.id) {
               utils.solve(challenges.christmasSpecialChallenge)
             }
 
             const itemTotal = price * BasketItem.quantity
+            maxDiscountPoints += Math.floor(2 * (itemTotal * 0.25)) 
+
             const product = {
               quantity: BasketItem.quantity,
               name: name,
@@ -82,6 +85,10 @@ module.exports = function placeOrder() {
           doc.end()
           if (utils.notSolved(challenges.negativeOrderChallenge) && totalPrice < 0) {
             utils.solve(challenges.negativeOrderChallenge)
+          }
+
+          if (utils.notSolved(challenges.extraAppliedPointsChallenge) && this.appliedPoints > maxDiscountPoints) {
+            utils.solve(challenges.extraAppliedPointsChallenge)
           }
 
           db.orders.insert({
