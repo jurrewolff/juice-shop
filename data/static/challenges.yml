@@ -694,3 +694,10 @@
     difficulty: 2
     hint: 'Start this challenge by visiting your own basket.'
     key: stealRewardPointChallenge
+-
+    name: 'Extra Applied Points'
+    category: 'Broken Access Control'
+    description: 'Apply more bonus points on checkout than the shop intends you to.'
+    difficulty: 2
+    hint: 'Observe. Even what you cant directly see.'
+    key: extraAppliedPointsChallenge
