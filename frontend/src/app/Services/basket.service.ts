@@ -37,6 +37,10 @@ export class BasketService {
     return this.http.post(this.hostServer + '/rest/basket/' + id + '/checkout',{ 'couponData': couponData }).pipe(map((response: any) => response.orderConfirmation), catchError((error) => { throw error }))
   }
 
+  applyPoints (id, points) {
+    return this.http.put(this.hostServer + '/rest/basket/' + id + '/appliedPoints/' + points, {}).pipe(map((response: any) => response.points), catchError((error) => { throw error }))
+  }
+
   applyCoupon (id, coupon) {
     return this.http.put(this.hostServer + '/rest/basket/' + id + '/coupon/' + coupon, {}).pipe(map((response: any) => response.discount), catchError((error) => { throw error }))
   }

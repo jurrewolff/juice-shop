@@ -9,12 +9,14 @@ const challenges = require('../data/datacache').challenges
 const config = require('config')
 const db = require('../data/mongodb')
 
+
 module.exports = function placeOrder() {
   return (req, res, next) => {
     const id = req.params.id
     models.Basket.findOne({ where: { id }, include: [{ model: models.Product, paranoid: false }] })
       .then(basket => {
         if (basket) {
+          appliedPoints = basket.appliedPoints
           const customer = insecurity.authenticatedUsers.from(req)
           const email = customer ? customer.data ? customer.data.email : '' : ''
           const orderId = insecurity.hash(email).slice(0, 4) + '-' + utils.randomHexString(16)
@@ -44,19 +46,16 @@ module.exports = function placeOrder() {
             }
 
             const itemTotal = price * BasketItem.quantity
-            const itemBonus = Math.round(price / 10) * BasketItem.quantity
             const product = {
               quantity: BasketItem.quantity,
               name: name,
               price: price,
               total: itemTotal,
-              bonus: itemBonus
             }
             basketProducts.push(product)
             doc.text(BasketItem.quantity + 'x ' + name + ' ea. ' + price + ' = ' + itemTotal)
             doc.moveDown()
             totalPrice += itemTotal
-            totalPoints += itemBonus
           })
           doc.moveDown()
           const discount = calculateApplicableDiscount(basket, req)
@@ -66,10 +65,17 @@ module.exports = function placeOrder() {
             doc.moveDown()
             totalPrice -= discountAmount
           }
+          if (this.appliedPoints > 0) {
+            const rewardDiscountAmount = (this.appliedPoints *  0.5)
+            doc.font('Times-Italic', 15).text('Used ' + this.appliedPoints + ' reward point(s) for a discount of ' + rewardDiscountAmount)
+            doc.moveDown()
+            totalPrice -= rewardDiscountAmount
+          }
+          totalPoints = Math.floor(totalPrice / 10)
           doc.font('Helvetica-Bold', 20).text('Total Price: ' + totalPrice.toFixed(2))
           doc.moveDown()
-          doc.font('Helvetica-Bold', 15).text('Bonus Points Earned: ' + totalPoints)
-          doc.font('Times-Roman', 15).text('(You will be able to these points for amazing bonuses in the future!)')
+          doc.font('Helvetica-Bold', 15).text('Bonus Point(s) Earned: ' + totalPoints)
+          doc.font('Times-Roman', 15).text('(You are able to use these points for a discount!)')
           doc.moveDown()
           doc.moveDown()
           doc.font('Times-Roman', 15).text('Thank you for your order!')
@@ -89,7 +95,11 @@ module.exports = function placeOrder() {
 
           fileWriter.on('finish', () => {
             basket.update({ coupon: null })
+            basket.update({ appliedPoints: null })
             models.BasketItem.destroy({ where: { BasketId: id } })
+            models.Reward.findOne({ where: {UserId: customer.data.id} }).then(reward => {
+              models.Reward.update({amount: (reward.amount + (totalPoints - this.appliedPoints))}, { where: { UserId: customer.data.id}})
+            })
             res.json({ orderConfirmation: '/ftp/' + pdfFile })
           })
         } else {

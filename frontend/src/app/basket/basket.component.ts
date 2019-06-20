@@ -12,6 +12,7 @@ import {
   faCartArrowDown,
   faCreditCard,
   faGift,
+  faCoins,
   faHeart,
   faMinusSquare,
   faPlusSquare,
@@ -24,7 +25,7 @@ import {
 import { faCreditCard as faCredit, faTrashAlt } from '@fortawesome/free-regular-svg-icons/'
 import { faBtc, faEthereum, faPaypal, faLeanpub, faPatreon } from '@fortawesome/free-brands-svg-icons'
 
-library.add(faMinusSquare, faPlusSquare, faCartArrowDown, faGift, faCreditCard, faTrashAlt, faHeart, faBtc, faPaypal, faLeanpub, faEthereum, faCredit, faThumbsUp, faTshirt, faStickyNote, faHandHoldingUsd, faCoffee, faPatreon)
+library.add(faMinusSquare, faPlusSquare, faCartArrowDown, faGift, faCoins, faCreditCard, faTrashAlt, faHeart, faBtc, faPaypal, faLeanpub, faEthereum, faCredit, faThumbsUp, faTshirt, faStickyNote, faHandHoldingUsd, faCoffee, faPatreon)
 dom.watch()
 
 @Component({
@@ -32,40 +33,50 @@ dom.watch()
   templateUrl: './basket.component.html',
   styleUrls: ['./basket.component.scss']
 })
+
 export class BasketComponent implements OnInit {
 
   public userEmail: string
+  public userId: number
   public displayedColumns = ['product','price','quantity','total price','remove']
   public dataSource = []
+  public currentRewardPoints = 0
+  public maxDiscountPoints = 0
   public bonus = 0
   public bonusBalance = 0
   public couponPanelExpanded: boolean = false
   public paymentPanelExpanded: boolean = false
+  public pointAmountExpanded: boolean = false
   public couponControl: FormControl = new FormControl('',[Validators.required, Validators.minLength(10), Validators.maxLength(10)])
+  public points: FormControl = undefined  // Will be filled in load() as currentRewardPoints needs to be filled first
   public error = undefined
   public confirmation = undefined
+  public confirmationPoints = undefined
   public twitterUrl = null
   public facebookUrl = null
   public applicationName = 'OWASP Juice Shop'
   public redirectUrl = null
   public clientDate: any
   private campaignCoupon: string
+  public appliedPoints: number
 
   constructor (private dialog: MatDialog,private basketService: BasketService,private userService: UserService,private windowRefService: WindowRefService,private configurationService: ConfigurationService,private translate: TranslateService) {}
 
   ngOnInit () {
-    this.load()
     this.userService.whoAmI().subscribe((data) => {
       this.userEmail = data.email || 'anonymous'
       this.userEmail = '(' + this.userEmail + ')'
-
-      this.basketService.getBonus(data.id).subscribe((bonusData) => {
-        this.bonusBalance = bonusData.amount
-      },(err) => console.log(err))
+      this.userId = data.id
+      this.basketService.getBonus(data.id).subscribe((rewardPoints) => {
+        this.currentRewardPoints = rewardPoints.amount
+        this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
+        this.load()
+      })
     },(err) => console.log(err))
 
     this.couponPanelExpanded = localStorage.getItem('couponPanelExpanded') ? JSON.parse(localStorage.getItem('couponPanelExpanded')) : false
     this.paymentPanelExpanded = localStorage.getItem('paymentPanelExpanded') ? JSON.parse(localStorage.getItem('paymentPanelExpanded')) : false
+    this.pointAmountExpanded = localStorage.getItem('pointAmountExpanded') ? JSON.parse(localStorage.getItem('pointAmountExpanded')) : false
 
     this.configurationService.getApplicationConfiguration().subscribe((config) => {
       if (config && config.application) {
@@ -85,14 +96,52 @@ export class BasketComponent implements OnInit {
   load () {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
+      this.maxDiscountPoints = 0
       let bonusPoints = 0
-      basket.Products.map(product => {
-        if (product.BasketItem && product.BasketItem.quantity) {
-          bonusPoints += Math.round(product.price / 10) * product.BasketItem.quantity
+      let totalPrice = 0
+      let basketProducts = []
+      let usedPoints = this.appliedPoints * 0.5
+
+      basket.Products.forEach(({ BasketItem, price, name }) => {
+        const itemTotal = (price) * BasketItem.quantity
+        const product = {
+          quantity: BasketItem.quantity,
+          name: name,
+          price: price,
+          total: itemTotal
         }
+        basketProducts.push(product)
+        totalPrice += itemTotal
       })
-      this.bonus = bonusPoints
-    },(err) => console.log(err))
+
+      this.maxDiscountPoints = Math.floor(2 * (totalPrice * 0.25))
+
+      if (this.maxDiscountPoints > this.currentRewardPoints) {
+        this.maxDiscountPoints = this.currentRewardPoints
+      }
+
+      if (usedPoints > 0) {
+        totalPrice = (totalPrice - usedPoints)
+        this.bonus = Math.floor(totalPrice * 0.1)
+      } else {
+        this.bonus = Math.floor(totalPrice * 0.1)
+      }
+
+    }
+    ,(err) => console.log(err))
+  }
+
+  applyPoints () {
+    this.appliedPoints = this.points.value
+    if (this.appliedPoints > 0) {
+      this.basketService.applyPoints(sessionStorage.getItem('bid'), this.appliedPoints).subscribe((data) => {
+        this.showConfirmationPoints(this.appliedPoints)
+      },(err) => {
+        console.log(err)
+      })
+
+    }
+    this.load()
   }
 
   delete (id) {
@@ -143,6 +192,11 @@ export class BasketComponent implements OnInit {
     localStorage.setItem('paymentPanelExpanded',JSON.stringify(this.paymentPanelExpanded))
   }
 
+  togglePoint () {
+    this.pointAmountExpanded = !this.pointAmountExpanded
+    localStorage.setItem('pointAmountExpanded',JSON.stringify(this.pointAmountExpanded))
+  }
+
   checkout () {
     this.basketService.checkout(sessionStorage.getItem('bid'), btoa(this.campaignCoupon + '-' + this.clientDate)).subscribe((orderConfirmationPath) => {
       this.redirectUrl = this.basketService.hostServer + orderConfirmationPath
@@ -181,6 +235,18 @@ export class BasketComponent implements OnInit {
       this.confirmation = discountApplied
     }, (translationId) => {
       this.confirmation = translationId
+    })
+  }
+
+  showConfirmationPoints (points) {
+    this.points.reset()
+    this.points.markAsPristine()
+    this.points.markAsUntouched()
+    this.error = undefined
+    this.translate.get('POINTS_APPLIED', { points }).subscribe((discountPointsApplied) => {
+      this.confirmationPoints = discountPointsApplied
+    }, (translationId) => {
+      this.confirmationPoints = translationId
     })
   }
 

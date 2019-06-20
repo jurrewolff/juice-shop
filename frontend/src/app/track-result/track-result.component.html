@@ -53,7 +53,7 @@
   </mat-table>
 </div>
 
-<div class="bonus-container">
-  <h2>Bonus Points Earned: {{ results.bonus }}</h2>
-  <p>(You will be able to redeem these points for <i>amazing bonuses</i> in the future!)</p>
+<div *ngIf="results.bonus" class="bonus-container">
+  <h2 translate [translateParams] ="{'results.bonus': results.bonus}">BONUS_POINTS_EARNED</h2>
+  <p translate>BONUS_POINTS_TEXT</p>
 </div>

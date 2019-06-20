@@ -42,6 +42,7 @@ const resetPassword = require('./routes/resetPassword')
 const securityQuestion = require('./routes/securityQuestion')
 const search = require('./routes/search')
 const coupon = require('./routes/coupon')
+const points = require('./routes/reward')
 const basket = require('./routes/basket')
 const order = require('./routes/order')
 const verify = require('./routes/verify')
@@ -228,9 +229,10 @@ app.use('/b2b/v2', insecurity.isAuthorized())
 app.post('/api/BasketItems', basketItems())
 
 /* verify steal reward points challenge */
-app.get('/api/Rewards/:id', insecurity.isAuthorized())
 app.get('/api/Rewards/:id', verify.stealRewardPointChallenge())
 
+/* Add applied reward points*/ 
+app.put('/rest/basket/:id/appliedPoints/:points', insecurity.isAuthorized())
 
 /* Verify the 2FA Token */
 app.post('/rest/2fa/verify',
@@ -298,6 +300,7 @@ app.get('/rest/user/authentication-details', authenticatedUsers())
 app.get('/rest/product/search', search())
 app.get('/rest/basket/:id', basket())
 app.post('/rest/basket/:id/checkout', order())
+app.put('/rest/basket/:id/appliedPoints/:points', points())
 app.put('/rest/basket/:id/coupon/:coupon', coupon())
 app.get('/rest/admin/application-version', appVersion())
 app.get('/rest/admin/application-configuration', appConfiguration())
