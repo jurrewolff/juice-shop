@@ -51,7 +51,6 @@ module.exports = function placeOrder() {
               name: name,
               price: price,
               total: itemTotal,
-              //bonus: itemBonus
             }
             basketProducts.push(product)
             doc.text(BasketItem.quantity + 'x ' + name + ' ea. ' + price + ' = ' + itemTotal)

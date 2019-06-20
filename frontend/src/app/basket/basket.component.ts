@@ -40,8 +40,8 @@ export class BasketComponent implements OnInit {
   public userId: number
   public displayedColumns = ['product','price','quantity','total price','remove']
   public dataSource = []
-  public currentRewardPoints = 0;
-  public maxDiscountPoints = 0;
+  public currentRewardPoints = 0
+  public maxDiscountPoints = 0
   public bonus = 0
   public bonusBalance = 0
   public couponPanelExpanded: boolean = false
@@ -68,7 +68,7 @@ export class BasketComponent implements OnInit {
       this.userEmail = '(' + this.userEmail + ')'
       this.userId = data.id
       this.basketService.getBonus(data.id).subscribe((rewardPoints) => {
-        this.currentRewardPoints = rewardPoints.amount;
+        this.currentRewardPoints = rewardPoints.amount
         this.points = new FormControl('0',[Validators.required, Validators.pattern('[0-9]*'), Validators.max(this.currentRewardPoints)])
         this.load()
       })
@@ -92,59 +92,57 @@ export class BasketComponent implements OnInit {
       }
     },(err) => console.log(err))
   }
-  
+
   load () {
     this.basketService.find(sessionStorage.getItem('bid')).subscribe((basket) => {
       this.dataSource = basket.Products
-      this.maxDiscountPoints = 0;
+      this.maxDiscountPoints = 0
       let bonusPoints = 0
-      let totalPrice = 0;
+      let totalPrice = 0
       let basketProducts = []
       let usedPoints = this.appliedPoints * 0.5
 
       basket.Products.forEach(({ BasketItem, price, name }) => {
-          const itemTotal = (price) * BasketItem.quantity
-          const product = {
-            quantity: BasketItem.quantity,
-            name: name,
-            price: price,
-            total: itemTotal,   
-          } 
+        const itemTotal = (price) * BasketItem.quantity
+        const product = {
+          quantity: BasketItem.quantity,
+          name: name,
+          price: price,
+          total: itemTotal
+        }
         basketProducts.push(product)
         totalPrice += itemTotal
       })
 
-      this.maxDiscountPoints = Math.floor(2* (totalPrice * 0.25)); 
+      this.maxDiscountPoints = Math.floor(2 * (totalPrice * 0.25))
 
-      if(this.maxDiscountPoints > this.currentRewardPoints){
+      if (this.maxDiscountPoints > this.currentRewardPoints) {
         this.maxDiscountPoints = this.currentRewardPoints
       }
 
-      if(usedPoints > 0 ){
+      if (usedPoints > 0) {
         totalPrice = (totalPrice - usedPoints)
         this.bonus = Math.floor(totalPrice * 0.1)
-      }
-      else {
+      } else {
         this.bonus = Math.floor(totalPrice * 0.1)
       }
-              
+
     }
-    ,(err) => console.log(err)) 
+    ,(err) => console.log(err))
   }
 
   applyPoints () {
     this.appliedPoints = this.points.value
-    if (this.appliedPoints > 0 ) {
+    if (this.appliedPoints > 0) {
       this.basketService.applyPoints(sessionStorage.getItem('bid'), this.appliedPoints).subscribe((data) => {
         this.showConfirmationPoints(this.appliedPoints)
       },(err) => {
         console.log(err)
       })
-      
-      
+
     }
     this.load()
-      }
+  }
 
   delete (id) {
     this.basketService.del(id).subscribe(() => {
@@ -289,5 +287,5 @@ export class BasketComponent implements OnInit {
     this.couponControl.setValue('')
     this.couponControl.markAsPristine()
     this.couponControl.markAsUntouched()
-  }  
+  }
 }
